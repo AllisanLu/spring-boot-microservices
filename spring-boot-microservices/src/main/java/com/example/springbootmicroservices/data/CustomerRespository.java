@@ -3,6 +3,9 @@ package com.example.springbootmicroservices.data;
 import java.util.ArrayList;
 import java.util.Optional;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class CustomerRespository {
 	private ArrayList<Customer> customers;
 	
@@ -33,4 +36,6 @@ public class CustomerRespository {
 		Optional<Customer> op = Optional.ofNullable(customer);
 		return op;
 	}
+	
+	
 }
