@@ -42,16 +42,29 @@ public class CustomerAPI {
 	}
 	
 	@PutMapping("/customers/{customerId}")
-	public Optional<Customer> updateCustomer(@PathVariable("customerId") Long id, 
+	public Optional<?> updateCustomer(@PathVariable("customerId") Long id, 
 			@RequestBody Customer customerDetails) {
 		Optional<Customer> customerOpt = repo.findById(id);
 		if (customerOpt.isPresent()) {
 			Customer customer = customerOpt.get();
 			customer.setName(customerDetails.getName());
 			customer.setEmail(customerDetails.getEmail());
+			
 			return Optional.of(repo.save(customer));
 		} 
-		return Optional.empty();
+		
+		if (customerDetails.getName() == null || customerDetails.getEmail() == null) {
+			return Optional.of(ResponseEntity.badRequest().build());
+		}
+		customerDetails = repo.save(customerDetails);
+		
+		URI location = ServletUriComponentsBuilder
+				.fromCurrentRequest()
+				.path("/{id}")
+				.buildAndExpand(customerDetails.getId())
+				.toUri();
+		
+		return Optional.of(ResponseEntity.created(location).build());
 	}
 	
 	@DeleteMapping("/customers/{customerId}")
