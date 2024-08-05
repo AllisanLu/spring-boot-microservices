@@ -1,11 +1,13 @@
-package com.example.springbootmicroservices;
+package com.example.springbootmicroservices.data;
 
 public class Customer {
+	private long id;
 	private String name;
 	private String email;
 	
-	public Customer(String name, String email) {
+	public Customer(long id, String name, String email) {
 		super();
+		this.id = id;
 		this.name = name;
 		this.email = email;
 	}
@@ -21,5 +23,13 @@ public class Customer {
 	}
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
 	}
 }
