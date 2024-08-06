@@ -48,5 +48,9 @@ public class Customer {
 	public long getId() {
 		return id;
 	}
+
+	public String getPassword() {
+		return password;
+	}
 	
 }
