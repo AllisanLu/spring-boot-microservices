@@ -21,8 +21,19 @@ public class CustomerAPI {
 	}
 	
 	@GetMapping("/customers/{customerId}")
-	public Optional<Customer> getCustomerById(@PathVariable("customerId") long id) {
-		return repo.findById(id);
+	public ResponseEntity<Customer> getCustomerById(@PathVariable("customerId") long id) {
+		Optional<Customer> customer = repo.findById(id);
+		
+		if (customer.isPresent()) {
+			return ResponseEntity.ok().body(customer.get());
+		}
+		
+		return ResponseEntity.badRequest().build();
+	}
+	
+	@GetMapping("/customers/byname/{name}")
+	public Optional<Customer> getCustomerByName(@PathVariable("name") String name) {
+		return repo.findFirstByName(name);
 	}
 	
 	@PostMapping("/customers")
