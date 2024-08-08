@@ -2,6 +2,7 @@ package com.example.springbootmicroservices.api;
 import com.example.springbootmicroservices.data.Customer;
 import com.example.springbootmicroservices.data.CustomerRespository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -16,8 +17,8 @@ public class CustomerAPI {
 	private CustomerRespository repo;
 	
 	@GetMapping("/customers")
-	public Iterable<Customer> getAll() {
-		return repo.findAll();
+	public ResponseEntity<?> getAll() {
+		return ResponseEntity.ok(repo.findAll());
 	}
 	
 	@GetMapping("/customers/{customerId}")
@@ -32,8 +33,8 @@ public class CustomerAPI {
 	}
 	
 	@GetMapping("/customers/byname/{name}")
-	public Optional<Customer> getCustomerByName(@PathVariable("name") String name) {
-		return repo.findFirstByName(name);
+	public ResponseEntity<?> getCustomerByName(@PathVariable("name") String name) {
+		return ResponseEntity.ok(repo.findFirstByName(name));
 	}
 	
 	@PostMapping("/customers")
@@ -49,11 +50,11 @@ public class CustomerAPI {
 				.buildAndExpand(customer.getId())
 				.toUri();
 		
-		return ResponseEntity.created(location).build();
+		return ResponseEntity.created(location).body(customer);
 	}
 	
 	@PutMapping("/customers/{customerId}")
-	public Optional<?> updateCustomer(@PathVariable("customerId") Long id, 
+	public ResponseEntity<?> updateCustomer(@PathVariable("customerId") Long id, 
 			@RequestBody Customer customerDetails) {
 		Optional<Customer> customerOpt = repo.findById(id);
 		if (customerOpt.isPresent()) {
@@ -61,11 +62,13 @@ public class CustomerAPI {
 			customer.setName(customerDetails.getName());
 			customer.setEmail(customerDetails.getEmail());
 			
-			return Optional.of(repo.save(customer));
+			repo.save(customer);
+			
+			return ResponseEntity.ok(customer);
 		} 
 		
 		if (customerDetails.getName() == null || customerDetails.getEmail() == null) {
-			return Optional.of(ResponseEntity.badRequest().build());
+			return ResponseEntity.badRequest().build();
 		}
 		customerDetails = repo.save(customerDetails);
 		
@@ -75,11 +78,12 @@ public class CustomerAPI {
 				.buildAndExpand(customerDetails.getId())
 				.toUri();
 		
-		return Optional.of(ResponseEntity.created(location).build());
+		return ResponseEntity.created(location).body(customerDetails);
 	}
 	
 	@DeleteMapping("/customers/{customerId}")
-	public void deleteCustomer(@PathVariable("customerId") Long id) {
+	public ResponseEntity<?> deleteCustomer(@PathVariable("customerId") Long id) {
 		repo.deleteById(id);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 }
